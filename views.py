@@ -16,14 +16,10 @@ def position(request, vehicle_id):
     if request.method == 'POST':
         lng = request.POST['lng']
         lat = request.POST['lat']
-        coord = {
-            'lng': lng,
-            'lat': lat,
-        }
 
         redis_instance.geoadd("geo", lng, lat, vehicle_id)
         response = {
-            'msg': f"{vehicle_id} successfully set to {coord}"
+            'msg': f"{vehicle_id} successfully set to {(lng, lat)}"
         }
         return Response(response, 201)
 
