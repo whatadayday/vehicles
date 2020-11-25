@@ -1,7 +1,7 @@
 import json
 from django.conf import settings
 import redis
-from geopy.distance import great_circle
+import pygeohash as pgh
 from rest_framework.decorators import api_view
 from rest_framework import status
 from rest_framework.response import Response
@@ -36,6 +36,10 @@ def find_vehicles(request):
 
         response = {}
         for key in redis_instance.georadius("geo", lng, lat, nearby_radius):
-            response[key] = redis_instance.geohash(key).copy()
-
+            geohashstr = redis_instance.geohash("geo", key)[0]
+            (lng, lat) = pgh.decode(geohashstr)
+            response[key] = {
+                'lng': lng,
+                'lat': lat,
+            }
         return Response(response, 201)
